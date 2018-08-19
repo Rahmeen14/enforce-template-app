@@ -1,0 +1,47 @@
+{
+  "name": "enforce-template-use",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Akshita <aggarwalakshita1@gmail.com>",
+  "license": "ISC",
+  "repository": "https://github.com/Akshitaag/enforce-template-use.git",
+  "homepage": "https://github.com/Akshitaag/enforce-template-use",
+  "bugs": "https://github.com/Akshitaag/enforce-template-use/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "dev": "nodemon",
+    "start": "probot run ./index.js",
+    "lint": "standard --fix",
+    "test": "jest && standard",
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+  },
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "probot": "^7.0.0"
+  },
+  "devDependencies": {
+    "jest": "^22.4.3",
+    "nodemon": "^1.17.2",
+    "smee-client": "^1.0.2",
+    "standard": "^10.0.3"
+  },
+  "engines": {
+    "node": ">= 8.3.0"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  }
+}
