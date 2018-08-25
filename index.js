@@ -14,7 +14,8 @@ module.exports = app => {
 
   app.on('issues.opened', async context => {
     const issueBody = (context.payload.issue.body)
-    const issueComment = context.issue({ body: 'Thanks for opening this issue!' })
+    const issueCommentOnSuccess = context.issue({ body: 'Thanks for opening this issue!' })
+    const issueCommentOnFailure = context.issue({ body: 'Please abide by the template while opening an issue' })
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
@@ -22,7 +23,7 @@ module.exports = app => {
     * content in base64 format
     */
     const templateBody = await fetchJSON(
-      `https://api.github.com/repos/${owner}/${repo}/contents/README.md`
+      `https://api.github.com/repos/${owner}/${repo}/contents/ISSUE_TEMPLATE.md`
     )
     context.log('issueBody', issueBody)
     var encoded = JSON.parse(templateBody)
@@ -32,7 +33,16 @@ module.exports = app => {
     /* if (issueBody === templateBody) {
       context.log(context.payload.issue.body)
     } */
-    return context.github.issues.createComment(issueComment)
+    var lines = templateBody.split('\n')
+    var isFollowingTemplate = true
+    for (var i = 0; i < lines.length; i++) {
+      console.log(lines[i])
+      if (issueBody.includes(lines[i]) === false) {
+        isFollowingTemplate = false
+        break
+      }
+    }
+    return isFollowingTemplate ? context.github.issues.createComment(issueCommentOnSuccess) : context.github.issues.createComment(issueCommentOnFailure)
   })
 
   // For more information on building apps:
