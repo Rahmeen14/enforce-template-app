@@ -37,12 +37,22 @@ module.exports = app => {
     // console.log(lines.length)
     var isFollowingTemplate = true
     for (var i = 0; i < lines.length; i++) {
-      if (issueBody.includes(lines[i]) === false) {
-        isFollowingTemplate = false
+      if (issueBody.includes(lines[i])) {
+        continue
+      }
+      isFollowingTemplate = (lines[i].includes('* [ ]')
+      ? [lines[i], lines[i].replace('* [ ]', '* [x]')].some(l => issueBody.includes(l))
+      : issueBody.includes(lines[i])) ||
+      (lines[i].includes('- [ ]')
+      ? [lines[i], lines[i].replace('- [ ]', '- [x]')].some(l => issueBody.includes(l))
+      : issueBody.includes(lines[i]))
+      if (!isFollowingTemplate) {
         break
       }
     }
-    return isFollowingTemplate ? context.github.issues.createComment(issueCommentOnSuccess) : context.github.issues.createComment(issueCommentOnFailure)
+    return isFollowingTemplate
+    ? context.github.issues.createComment(issueCommentOnSuccess)
+    : context.github.issues.createComment(issueCommentOnFailure)
   })
 
   // For more information on building apps:
