@@ -1,7 +1,11 @@
 const {
   fetchJSON,
   getOwner,
-  getRepo
+  getRepo,
+  getCommentOnSuccess,
+  getCommentOnFailure,
+  isIssueFollowingTemplate,
+  getTemplateFields
 } = require('./util')
 /**
  * This is the entry point for your Probot App.
@@ -9,47 +13,44 @@ const {
  */
 var base64 = require('base-64')
 module.exports = app => {
-  // Your code here
+
   app.log('Yay, the app was loaded!')
 
   app.on('issues.opened', async context => {
     const issueBody = (context.payload.issue.body)
-    const issueCommentOnSuccess = context.issue({ body: 'Thanks for opening this issue!' })
-    const issueCommentOnFailure = context.issue({ body: 'Please abide by the template while opening an issue' })
+    const issueCommentOnSuccess = getCommentOnSuccess(context)
+    const issueCommentOnFailure = getCommentOnFailure(context)
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
-    * Fetch contents of readme.md containing
+    * Fetch contents of ISSUE_TEMPLATE.md containing
     * content in base64 format
     */
     const templateBody = await fetchJSON(
       `https://api.github.com/repos/${owner}/${repo}/contents/ISSUE_TEMPLATE.md`
     )
-    context.log('issueBody', issueBody)
-    var encoded = JSON.parse(templateBody)
-    var bytes = base64.decode(encoded.content)
-    console.log('templateBody', bytes)
-
-    /* if (issueBody === templateBody) {
-      context.log(context.payload.issue.body)
-    } */
-    var lines = bytes.toString().split('\n')
-    // console.log(lines.length)
-    var isFollowingTemplate = true
-    for (var i = 0; i < lines.length; i++) {
-      if (issueBody.includes(lines[i])) {
-        continue
+   /**
+    * Parse the fetched JSON issue template and
+    * extract all fields from it for comparasion
+    * against the issue body
+    */
+    let encoded = JSON.parse(templateBody)
+    let templateBytes = base64.decode(encoded.content)
+    const templateFields = getTemplateFields(templateBytes)
+    /**
+     * A boolean to flag the violation of issue template
+     */
+    let isFollowingTemplate = true
+    /**
+     * Checks for occurance of every template field in the
+     * issue body and returns an appropriate comment based
+     * on the flag value
+     */
+    templateFields.forEach(function (templateField) {
+      if (!isIssueFollowingTemplate(templateField, issueBody)) {
+        isFollowingTemplate = false
       }
-      isFollowingTemplate = (lines[i].includes('* [ ]')
-      ? [lines[i], lines[i].replace('* [ ]', '* [x]')].some(l => issueBody.includes(l))
-      : issueBody.includes(lines[i])) ||
-      (lines[i].includes('- [ ]')
-      ? [lines[i], lines[i].replace('- [ ]', '- [x]')].some(l => issueBody.includes(l))
-      : issueBody.includes(lines[i]))
-      if (!isFollowingTemplate) {
-        break
-      }
-    }
+    })
     return isFollowingTemplate
     ? context.github.issues.createComment(issueCommentOnSuccess)
     : context.github.issues.createComment(issueCommentOnFailure)
