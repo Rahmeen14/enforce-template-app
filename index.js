@@ -13,7 +13,6 @@ const {
  */
 var base64 = require('base-64')
 module.exports = app => {
-
   app.log('Yay, the app was loaded!')
 
   app.on('issues.opened', async context => {
