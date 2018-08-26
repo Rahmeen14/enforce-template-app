@@ -33,10 +33,10 @@ module.exports = app => {
     /* if (issueBody === templateBody) {
       context.log(context.payload.issue.body)
     } */
-    var lines = templateBody.split('\n')
+    var lines = bytes.toString().split('\n')
+    // console.log(lines.length)
     var isFollowingTemplate = true
     for (var i = 0; i < lines.length; i++) {
-      console.log(lines[i])
       if (issueBody.includes(lines[i]) === false) {
         isFollowingTemplate = false
         break
