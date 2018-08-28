@@ -1,5 +1,5 @@
 const fetch = require('node-fetch')
-
+var base64 = require('base-64')
 /**
  * @param {string} url
  * @param {object} [options] as accepted by `fetch`
@@ -15,6 +15,16 @@ const fetchJSON = (url, options = {}) =>
  */
 const getOwner = context => context.payload.repository.owner.login
 
+/**
+ * @param {object} templateBody
+ * @return {Array} an array of template fields
+ */
+const parseBody = templateBody => {
+  let encoded = JSON.parse(templateBody)
+  let templateBytes = base64.decode(encoded.content)
+  const templateFields = getTemplateFields(templateBytes)
+  return templateFields
+}
 /**
  * @param {Context} context
  * @return {string} repo name
@@ -56,6 +66,15 @@ const isFollowingTemplate = (templateField, bodyText) => {
  */
 const getTemplateFields = templateBytes => templateBytes.toString().split('\n')
 
+const isBodyFollowingTemplate = (templateFields, followsTemplateBoolean, bodyText) => {
+  templateFields.forEach(function (templateField) {
+    if (!isFollowingTemplate(templateField, bodyText)) {
+      followsTemplateBoolean = false
+    }
+  })
+  return followsTemplateBoolean
+}
+
 /**
  * @param {Context} context
  * @param {boolean} isFollowingTemplate
@@ -71,7 +90,9 @@ const getFinalComment = (context, isFollowingTemplate, commentOnSuccess, comment
 exports.getTemplateFields = getTemplateFields
 exports.getFinalComment = getFinalComment
 exports.isFollowingTemplate = isFollowingTemplate
+exports.isBodyFollowingTemplate = isBodyFollowingTemplate
 exports.getComment = getComment
 exports.fetchJSON = fetchJSON
 exports.getOwner = getOwner
 exports.getRepo = getRepo
+exports.parseBody = parseBody

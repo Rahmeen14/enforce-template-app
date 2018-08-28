@@ -3,15 +3,14 @@ const {
   getOwner,
   getRepo,
   getComment,
-  isFollowingTemplate,
-  getTemplateFields,
-  getFinalComment
+  isBodyFollowingTemplate,
+  getFinalComment,
+  parseBody
 } = require('./util')
 /**
  * This is the entry point for your Probot App.
  * @param {import('probot').Application} app - Probot's Application class.
  */
-var base64 = require('base-64')
 module.exports = app => {
   app.log('Yay, the app was loaded!')
 
@@ -33,26 +32,15 @@ module.exports = app => {
     * extract all fields from it for comparasion
     * against the issue body
     */
-    let encoded = JSON.parse(templateBody)
-    let templateBytes = base64.decode(encoded.content)
-    const templateFields = getTemplateFields(templateBytes)
-    /**
-     * A boolean to flag the violation of issue template
-     */
-    let isIssueFollowingTemplate = true
+    const templateFields = parseBody(templateBody)
     /**
      * Checks for occurance of every template field in the
      * issue body and returns an appropriate comment based
      * on the flag value
      */
-    templateFields.forEach(function (templateField) {
-      if (!isFollowingTemplate(templateField, issueBody)) {
-        isIssueFollowingTemplate = false
-      }
-    })
-    return getFinalComment(context, isIssueFollowingTemplate, issueCommentOnSuccess, issueCommentOnFailure)
+    return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, issueBody), issueCommentOnSuccess, issueCommentOnFailure)
   })
-  
+
   app.on('pull_request.opened', async context => {
     const pullRequestBody = (context.payload.pull_request.body)
     const pullRequestCommentOnSuccess = getComment(context, 'Thank you for the pull request')
@@ -67,28 +55,17 @@ module.exports = app => {
       `https://api.github.com/repos/${owner}/${repo}/contents/PULL_REQUEST_TEMPLATE.md`
     )
    /**
-    * Parse the fetched JSON issue template and
+    * Parse the fetched JSON pull request template and
     * extract all fields from it for comparasion
-    * against the issue body
+    * against the PR body
     */
-    let encoded = JSON.parse(templateBody)
-    let templateBytes = base64.decode(encoded.content)
-    const templateFields = getTemplateFields(templateBytes)
-    /**
-     * A boolean to flag the violation of issue template
-     */
-    let isPullRequestFollowingTemplate = true
+    const templateFields = parseBody(templateBody)
     /**
      * Checks for occurance of every template field in the
      * issue body and returns an appropriate comment based
      * on the flag value
      */
-    templateFields.forEach(function (templateField) {
-      if (!isFollowingTemplate(templateField, pullRequestBody)) {
-        isPullRequestFollowingTemplate = false
-      }
-    })
-    return getFinalComment(context, isPullRequestFollowingTemplate, pullRequestCommentOnSuccess, pullRequestCommentOnFailure)
+    return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, pullRequestBody), pullRequestCommentOnSuccess, pullRequestCommentOnFailure)
   })
   // For more information on building apps:
   // https://probot.github.io/docs/
