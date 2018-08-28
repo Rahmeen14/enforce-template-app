@@ -21,9 +21,7 @@ const getOwner = context => context.payload.repository.owner.login
  */
 const parseBody = templateBody => {
   let encoded = JSON.parse(templateBody)
-  let templateBytes = base64.decode(encoded.content)
-  const templateFields = getTemplateFields(templateBytes)
-  return templateFields
+  return getTemplateFields(base64.decode(encoded.content))
 }
 /**
  * @param {Context} context
@@ -35,15 +33,15 @@ const getRepo = context => context.payload.repository.name
 /**
  * @param {Context} context
  * @param {string} message
- * @return {object} isssue comment body
+ * @return {object} comment body
  *
  */
 const getComment = (context, message) => context.issue({ body: message })
 
 /**
  * @param {string} templateField
- * @param {object} issueBody
- * @return {boolean} whether issue body contains the given templateField
+ * @param {object} bodyText
+ * @return {boolean} whether issue/PR body contains the given templateField
  *
  */
 const isFollowingTemplate = (templateField, bodyText) => {
@@ -66,6 +64,12 @@ const isFollowingTemplate = (templateField, bodyText) => {
  */
 const getTemplateFields = templateBytes => templateBytes.toString().split('\n')
 
+/**
+ * @param {Array} templateFields
+ * @param {boolean} followsTemplateBoolean
+ * @param {object} bodyText
+ * @return {boolean} whether the issue/PR body follow the template
+ */
 const isBodyFollowingTemplate = (templateFields, followsTemplateBoolean, bodyText) => {
   templateFields.forEach(function (templateField) {
     if (!isFollowingTemplate(templateField, bodyText)) {

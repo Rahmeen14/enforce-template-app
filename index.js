@@ -36,7 +36,7 @@ module.exports = app => {
     /**
      * Checks for occurance of every template field in the
      * issue body and returns an appropriate comment based
-     * on the flag value
+     * on whether the template is abided by
      */
     return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, issueBody), issueCommentOnSuccess, issueCommentOnFailure)
   })
@@ -48,7 +48,7 @@ module.exports = app => {
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
-    * Fetch contents of ISSUE_TEMPLATE.md containing
+    * Fetch contents of PULL_REQUEST_TEMPLATE.md containing
     * content in base64 format
     */
     const templateBody = await fetchJSON(
@@ -62,8 +62,8 @@ module.exports = app => {
     const templateFields = parseBody(templateBody)
     /**
      * Checks for occurance of every template field in the
-     * issue body and returns an appropriate comment based
-     * on the flag value
+     * PR body and returns an appropriate comment based
+     * on whether the template is abided by
      */
     return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, pullRequestBody), pullRequestCommentOnSuccess, pullRequestCommentOnFailure)
   })
