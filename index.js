@@ -2,12 +2,10 @@ const {
   fetchJSON,
   getOwner,
   getRepo,
-  getIssueCommentOnSuccess,
-  getIssueCommentOnFailure,
-  getPullRequestCommentOnSuccess,
-  getPullRequestCommentOnFailure,
+  getComment,
   isFollowingTemplate,
-  getTemplateFields
+  getTemplateFields,
+  getFinalComment
 } = require('./util')
 /**
  * This is the entry point for your Probot App.
@@ -19,8 +17,8 @@ module.exports = app => {
 
   app.on('issues.opened', async context => {
     const issueBody = (context.payload.issue.body)
-    const issueCommentOnSuccess = getIssueCommentOnSuccess(context)
-    const issueCommentOnFailure = getIssueCommentOnFailure(context)
+    const issueCommentOnSuccess = getComment(context, 'Thank you for opening this issue')
+    const issueCommentOnFailure = getComment(context, 'Please abide by the template ISSUE_TEMPLATE.md while opening issues')
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
@@ -52,14 +50,13 @@ module.exports = app => {
         isIssueFollowingTemplate = false
       }
     })
-    return isIssueFollowingTemplate
-    ? context.github.issues.createComment(issueCommentOnSuccess)
-    : context.github.issues.createComment(issueCommentOnFailure)
+    return getFinalComment(context, isIssueFollowingTemplate, issueCommentOnSuccess, issueCommentOnFailure)
   })
+  
   app.on('pull_request.opened', async context => {
     const pullRequestBody = (context.payload.pull_request.body)
-    const pullRequestCommentOnSuccess = getPullRequestCommentOnSuccess(context)
-    const pullRequestCommentOnFailure = getPullRequestCommentOnFailure(context)
+    const pullRequestCommentOnSuccess = getComment(context, 'Thank you for the pull request')
+    const pullRequestCommentOnFailure = getComment(context, 'Please abide by the template PULL_REQUEST_TEMPLATE.md while raising PRs')
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
@@ -91,9 +88,7 @@ module.exports = app => {
         isPullRequestFollowingTemplate = false
       }
     })
-    return isPullRequestFollowingTemplate
-    ? context.github.issues.createComment(pullRequestCommentOnSuccess)
-    : context.github.issues.createComment(pullRequestCommentOnFailure)
+    return getFinalComment(context, isPullRequestFollowingTemplate, pullRequestCommentOnSuccess, pullRequestCommentOnFailure)
   })
   // For more information on building apps:
   // https://probot.github.io/docs/

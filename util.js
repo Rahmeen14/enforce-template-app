@@ -24,37 +24,11 @@ const getRepo = context => context.payload.repository.name
 
 /**
  * @param {Context} context
+ * @param {string} message
  * @return {object} isssue comment body
  *
  */
-const getCommentOnSuccess = context => context.issue({ body: 'Thank you for opening this issue' })
-
-/**
- * @param {Context} context
- * @return {object} issue comment body
- *
- */
-const getCommentOnFailure = context => context.issue({ body: 'Please abide by the template ISSUE_TEMPLATE.md while opening issues' })
-
-/**
- * @param {string} templateField
- * @param {object} issueBody
- * @return {boolean} whether issue body contains the given templateField
- *
- */
-/**
- * @param {Context} context
- * @return {object} isssue comment body
- *
- */
-const getPullRequestCommentOnSuccess = context => context.issue({ body: 'Thank you for your pull request' })
-
-/**
- * @param {Context} context
- * @return {object} issue comment body
- *
- */
-const getPullRequestCommentOnFailure = context => context.issue({ body: 'Please abide by the template PULL_REQUEST_TEMPLATE.md while raising PRs' })
+const getComment = (context, message) => context.issue({ body: message })
 
 /**
  * @param {string} templateField
@@ -82,12 +56,22 @@ const isFollowingTemplate = (templateField, bodyText) => {
  */
 const getTemplateFields = templateBytes => templateBytes.toString().split('\n')
 
+/**
+ * @param {Context} context
+ * @param {boolean} isFollowingTemplate
+ * @param {object} commentOnSuccess
+ * @param {object} commentOnFailure
+ * @return {object} final comment to be displayed eventually
+ *
+ */
+const getFinalComment = (context, isFollowingTemplate, commentOnSuccess, commentOnFailure) => isFollowingTemplate
+    ? context.github.issues.createComment(commentOnSuccess)
+    : context.github.issues.createComment(commentOnFailure)
+
 exports.getTemplateFields = getTemplateFields
-exports.getPullRequestCommentOnFailure = getPullRequestCommentOnFailure
-exports.getPullRequestCommentOnSuccess = getPullRequestCommentOnSuccess
+exports.getFinalComment = getFinalComment
 exports.isFollowingTemplate = isFollowingTemplate
-exports.getCommentOnSuccess = getCommentOnSuccess
-exports.getCommentOnFailure = getCommentOnFailure
+exports.getComment = getComment
 exports.fetchJSON = fetchJSON
 exports.getOwner = getOwner
 exports.getRepo = getRepo
