@@ -3,10 +3,9 @@
 
 ## Statement : 
 * The Bot will require new Issues and PRs to use the respective templates and fill out their
-fields automatically.
+fields.
 * It will check that the template was actually used instead of deleted by ensuring that
-keywords are present in the body, along with placeholders which were replaced with
-user text.
+keywords are present in the body.
 
 ## Details of Implementation :
 * The repository on which the bot is to be installed is required to contain an ISSUE_TEMPLATE.md file as well as a PULL_REQUEST_TEMPLATE.md file
