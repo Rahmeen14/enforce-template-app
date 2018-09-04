@@ -5,7 +5,11 @@ const {
   getComment,
   isBodyFollowingTemplate,
   getFinalComment,
-  parseBody
+  parseBody,
+  ISSUE_TEMPLATE_FAILURE_MESSAGE,
+  ISSUE_TEMPLATE_SUCCESS_MESSAGE,
+  PULL_REQUEST_TEMPLATE_SUCCESS_MESSAGE,
+  PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE
 } = require('./util')
 /**
  * This is the entry point for your Probot App.
@@ -16,8 +20,8 @@ module.exports = app => {
 
   app.on('issues.opened', async context => {
     const issueBody = (context.payload.issue.body)
-    const issueCommentOnSuccess = getComment(context, 'Thank you for opening this issue')
-    const issueCommentOnFailure = getComment(context, 'Please abide by the template ISSUE_TEMPLATE.md while opening issues')
+    const issueCommentOnSuccess = getComment(context, ISSUE_TEMPLATE_SUCCESS_MESSAGE)
+    const issueCommentOnFailure = getComment(context, ISSUE_TEMPLATE_FAILURE_MESSAGE)
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
@@ -32,19 +36,27 @@ module.exports = app => {
     * extract all fields from it for comparasion
     * against the issue body
     */
-    const templateFields = parseBody(templateBody)
+    let templateFields = []
+    try {
+      templateFields = parseBody(templateBody)
+    } catch (err) {
+      console.error(err)
+    }
     /**
      * Checks for occurance of every template field in the
      * issue body and returns an appropriate comment based
      * on whether the template is abided by
      */
-    return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, issueBody), issueCommentOnSuccess, issueCommentOnFailure)
+    return getFinalComment(context,
+      isBodyFollowingTemplate(templateFields, true, issueBody),
+      issueCommentOnSuccess,
+      issueCommentOnFailure)
   })
 
   app.on('pull_request.opened', async context => {
     const pullRequestBody = (context.payload.pull_request.body)
-    const pullRequestCommentOnSuccess = getComment(context, 'Thank you for the pull request')
-    const pullRequestCommentOnFailure = getComment(context, 'Please abide by the template PULL_REQUEST_TEMPLATE.md while raising PRs')
+    const pullRequestCommentOnSuccess = getComment(context, PULL_REQUEST_TEMPLATE_SUCCESS_MESSAGE)
+    const pullRequestCommentOnFailure = getComment(context, PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE)
     const owner = getOwner(context)
     const repo = getRepo(context)
     /**
@@ -59,13 +71,21 @@ module.exports = app => {
     * extract all fields from it for comparasion
     * against the PR body
     */
-    const templateFields = parseBody(templateBody)
+    let templateFields = []
+    try {
+      templateFields = parseBody(templateBody)
+    } catch (err) {
+      console.error(err)
+    }
     /**
      * Checks for occurance of every template field in the
      * PR body and returns an appropriate comment based
      * on whether the template is abided by
      */
-    return getFinalComment(context, isBodyFollowingTemplate(templateFields, true, pullRequestBody), pullRequestCommentOnSuccess, pullRequestCommentOnFailure)
+    return getFinalComment(context,
+      isBodyFollowingTemplate(templateFields, true, pullRequestBody),
+      pullRequestCommentOnSuccess,
+      pullRequestCommentOnFailure)
   })
   // For more information on building apps:
   // https://probot.github.io/docs/
