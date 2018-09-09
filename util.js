@@ -1,9 +1,11 @@
 const fetch = require('node-fetch')
 var base64 = require('base-64')
 const ISSUE_TEMPLATE_SUCCESS_MESSAGE = 'Thank you for opening this issue'
-const ISSUE_TEMPLATE_FAILURE_MESSAGE = 'Please abide by the template ISSUE_TEMPLATE.md while opening issues'
+const ISSUE_TEMPLATE_FAILURE_MESSAGE =
+  'Please abide by the template ISSUE_TEMPLATE.md while opening issues'
 const PULL_REQUEST_TEMPLATE_SUCCESS_MESSAGE = 'Thank you for the pull request'
-const PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE = 'Please abide by the template PULL_REQUEST_TEMPLATE.md while raising PRs'
+const PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE =
+  'Please abide by the template PULL_REQUEST_TEMPLATE.md while raising PRs'
 /**
  * @param {string} url
  * @param {object} [options] as accepted by `fetch`
@@ -53,12 +55,18 @@ const isFollowingTemplate = (templateField, bodyText) => {
     return true
   }
   // Handles radio button markdown
-  return (templateField.includes('* [ ]')
-  ? [templateField, templateField.replace('* [ ]', '* [x]')].some(l => bodyText.includes(l))
-  : bodyText.includes(templateField)) ||
-  (templateField.includes('- [ ]')
-  ? [templateField, templateField.replace('- [ ]', '- [x]')].some(l => bodyText.includes(l))
-  : bodyText.includes(templateField))
+  return (
+    (templateField.includes('* [ ]')
+      ? [templateField, templateField.replace('* [ ]', '* [x]')].some(l =>
+          bodyText.includes(l)
+        )
+      : bodyText.includes(templateField)) ||
+    (templateField.includes('- [ ]')
+      ? [templateField, templateField.replace('- [ ]', '- [x]')].some(l =>
+          bodyText.includes(l)
+        )
+      : bodyText.includes(templateField))
+  )
 }
 
 /**
@@ -74,9 +82,13 @@ const getTemplateFields = templateBytes => templateBytes.toString().split('\n')
  * @param {object} bodyText
  * @return {boolean} whether the issue/PR body follow the template
  */
-const isBodyFollowingTemplate = (templateFields, followsTemplateBoolean, bodyText) =>
-    templateFields.every(t => isFollowingTemplate(t, bodyText)) ||
-    followsTemplateBoolean
+const isBodyFollowingTemplate = (
+  templateFields,
+  followsTemplateBoolean,
+  bodyText
+) =>
+  templateFields.every(t => isFollowingTemplate(t, bodyText)) ||
+  followsTemplateBoolean
 /**
  * @param {Context} context
  * @param {boolean} isFollowingTemplate
@@ -85,11 +97,15 @@ const isBodyFollowingTemplate = (templateFields, followsTemplateBoolean, bodyTex
  * @return {object} final comment to be displayed eventually
  *
  */
-const getFinalComment = (context, isFollowingTemplate, commentOnSuccess, commentOnFailure) => context.github.issues.createComment(
-  isFollowingTemplate
-    ? commentOnSuccess
-    : commentOnFailure
-)
+const getFinalComment = (
+  context,
+  isFollowingTemplate,
+  commentOnSuccess,
+  commentOnFailure
+) =>
+  context.github.issues.createComment(
+    isFollowingTemplate ? commentOnSuccess : commentOnFailure
+  )
 exports.ISSUE_TEMPLATE_FAILURE_MESSAGE = ISSUE_TEMPLATE_FAILURE_MESSAGE
 exports.ISSUE_TEMPLATE_SUCCESS_MESSAGE = ISSUE_TEMPLATE_SUCCESS_MESSAGE
 exports.PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE = PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE
