@@ -39,6 +39,10 @@
       "jest"
     ]
   },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
   "nodemonConfig": {
     "exec": "npm start",
     "watch": [
