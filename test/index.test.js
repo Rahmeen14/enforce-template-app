@@ -19,8 +19,8 @@ describe('My Probot app', () => {
     // This is an easy way to mock out the GitHub API
     github = {
       issues: {
-        createComment: jest.fn().mockReturnValue(Promise.resolve({}))
-      }
+        createComment: jest.fn().mockReturnValue(Promise.resolve({})),
+      },
     }
     // Passes the mocked out GitHub API into out app instance
     app.auth = () => Promise.resolve(github)
@@ -30,7 +30,7 @@ describe('My Probot app', () => {
     // Simulates delivery of an issues.opened webhook
     await app.receive({
       event: 'issues.opened',
-      payload: issuesOpenedPayload
+      payload: issuesOpenedPayload,
     })
 
     // This test passes if the code in your index.js file calls `context.github.issues.createComment`
