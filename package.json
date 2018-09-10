@@ -23,11 +23,11 @@
     "base-64": "^0.1.0",
     "probot": "^7.0.0"
   },
-   "devDependencies": {
+  "devDependencies": {
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "nodemon": "^1.17.2",
-    "prettier": "1.13.7",
+    "prettier": "^1.13.7",
     "smee-client": "^1.0.2",
     "standard": "^10.0.3"
   },
@@ -39,15 +39,15 @@
       "jest"
     ]
   },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
   "nodemonConfig": {
     "exec": "npm start",
     "watch": [
       ".env",
       "."
     ]
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   }
 }
