@@ -9,7 +9,7 @@ const {
   ISSUE_TEMPLATE_FAILURE_MESSAGE,
   ISSUE_TEMPLATE_SUCCESS_MESSAGE,
   PULL_REQUEST_TEMPLATE_SUCCESS_MESSAGE,
-  PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE,
+  PULL_REQUEST_TEMPLATE_FAILURE_MESSAGE
 } = require('./util')
 /**
  * This is the entry point for your Probot App.
@@ -55,7 +55,7 @@ module.exports = app => {
      */
     return getFinalComment(
       context,
-      isBodyFollowingTemplate(templateFields, true, issueBody),
+      isBodyFollowingTemplate(templateFields, false, issueBody),
       issueCommentOnSuccess,
       issueCommentOnFailure
     )
@@ -98,7 +98,7 @@ module.exports = app => {
      */
     return getFinalComment(
       context,
-      isBodyFollowingTemplate(templateFields, true, pullRequestBody),
+      isBodyFollowingTemplate(templateFields, false, pullRequestBody),
       pullRequestCommentOnSuccess,
       pullRequestCommentOnFailure
     )
