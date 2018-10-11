@@ -16,4 +16,4 @@ keywords are present in the body.
 
 ## Future Scope :
 * We want to enforce certain mandatory fields to necessarily contain some content
-* We also want to ensure that the content filled against these fields is relevant and not some random gibberish.
+* We also want to ensure that the content filled against these fields is relevant and not some random gibberish. 
