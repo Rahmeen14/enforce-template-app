@@ -4,7 +4,7 @@
   "description": "",
   "author": "Akshita <aggarwalakshita1@gmail.com>",
   "license": "ISC",
-  "repository": "https://github.com/Akshitaag/enforce-template-use.git",
+  "repository": "github:probot/enforce-template-app",
   "homepage": "https://github.com/Akshitaag/enforce-template-use",
   "bugs": "https://github.com/Akshitaag/enforce-template-use/issues",
   "keywords": [
